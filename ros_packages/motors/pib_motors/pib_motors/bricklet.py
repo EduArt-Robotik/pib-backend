@@ -5,8 +5,7 @@ from typing import Any
 
 from pib_api_client import bricklet_client
 from pib_motors.config import cfg
-from tinkerforge.brick_hat import BrickHAT
-from tinkerforge.bricklet_servo_v2 import BrickletServoV2
+from pib_motors.bricklet_pin import BrickletPin
 from tinkerforge.bricklet_solid_state_relay_v2 import BrickletSolidStateRelayV2
 from tinkerforge.bricklet_rgb_led_button import BrickletRGBLEDButton
 from tinkerforge.ip_connection import IPConnection, Error
@@ -14,9 +13,8 @@ from tinkerforge.ip_connection import IPConnection, Error
 TINKERFORGE_HOST = os.getenv("TINKERFORGE_HOST", "localhost")
 TINKERFORGE_PORT = int(os.getenv("TINKERFORGE_PORT", 4223))
 
-# Connection
-ipcon = IPConnection()  # Create IP connection
-hat = BrickHAT("X", ipcon)
+# Connection (used for SSR and RGB LED bricklets)
+ipcon = IPConnection()
 ipcon.connect(cfg.TINKERFORGE_HOST, cfg.TINKERFORGE_PORT)
 
 # get data from pib-api
@@ -74,10 +72,14 @@ for dto in bricklet_dtos["bricklets"]:
     elif dto["type"] == "RGB LED Button Bricklet" and dto["uid"]:
         rgb_led_bricklet_uids.append(dto["uid"])
 
-# maps the uid (e.g. 'XYZ') to the associated servo bricklet object
-uid_to_servo_bricklet: dict[str, BrickletServoV2] = {
-    uid: BrickletServoV2(uid, ipcon) for uid in servo_bricklet_uids if uid
-}
+# maps the uid (serial device path, e.g. '/dev/ttyUSB0') to the associated STS servo object
+uid_to_servo_bricklet: dict[str, BrickletPin] = {}
+for uid in servo_bricklet_uids:
+    try:
+        uid_to_servo_bricklet[uid] = BrickletPin(pin=1, uid=uid, invert=False)
+        logging.info(f"Initialized STS motor on {uid}")
+    except Exception as e:
+        logging.error(f"Failed to initialize STS motor for {uid}: {e}")
 
 # maps the uid (e.g. 'XYZ') to the associated solid state relay bricklet object
 if solid_state_relay_bricklet_uid:
@@ -107,7 +109,8 @@ def set_ssr_state(state: bool) -> None:
         except Error as e:
             if e.value == Error.TIMEOUT or e.value == Error.WRONG_RESPONSE_LENGTH:
                 logging.error(
-                    "Solid-State Relay is not connected or unresponsive (Timeout). Please check the UID and ensure the device is plugged in."
+                    "Solid-State Relay is not connected or unresponsive "
+                    "(Timeout). Please check the UID and ensure the device is plugged in."
                 )
             elif e.value == Error.INVALID_UID:
                 logging.error("Invalid UID for Solid-State Relay.")
@@ -131,12 +134,9 @@ def connected_enumerate(
     device_identifier,
     enumeration_type,
 ):
-    if (
-        device_identifier == BrickletServoV2.DEVICE_IDENTIFIER
-        and enumeration_type == IPConnection.ENUMERATION_TYPE_AVAILABLE
-    ):
+    if enumeration_type == IPConnection.ENUMERATION_TYPE_AVAILABLE:
         connected_bricklets.add(uid)
-        logging.info(f"Servo Bricklet {uid} is connected.")
+        logging.info(f"Bricklet {uid} is connected.")
     elif enumeration_type == IPConnection.ENUMERATION_TYPE_DISCONNECTED:
         connected_bricklets.discard(uid)
-        logging.info(f"Servo Bricklet {uid} is disconnected.")
+        logging.info(f"Bricklet {uid} is disconnected.")
