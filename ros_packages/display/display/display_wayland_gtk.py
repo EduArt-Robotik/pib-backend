@@ -17,6 +17,7 @@ from PIL import Image as PILImage, ImageDraw, ImageFont
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
+from rclpy.signals import SignalHandlerOptions
 from std_msgs.msg import String
 
 from datatypes.msg import DisplayImage, ImageFormat, ImageId
@@ -339,7 +340,7 @@ class DisplayNode(Node):
 
 
 def run_ros(command_queue: Queue[DisplayCommand]) -> None:
-    rclpy.init()
+    rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     executor = SingleThreadedExecutor()
     node = DisplayNode(command_queue)
     executor.add_node(node)

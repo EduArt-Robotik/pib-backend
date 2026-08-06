@@ -226,6 +226,9 @@ services:
       - XDG_RUNTIME_DIR=/run/user/1000
       - WAYLAND_DISPLAY=${WAYLAND_DISPLAY:-wayland-0}
       - GDK_BACKEND=wayland
+      - GSK_RENDERER=cairo
+      - LIBGL_ALWAYS_SOFTWARE=1
+      - GTK_A11Y=none
       - HOME=/tmp
       - ROS_HOME=/tmp/.ros
     user: "1000:1000"
