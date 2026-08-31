@@ -1,0 +1,13 @@
+# Goal
+string pose_name # Pose must exist in database for the goal to be accepted.
+---
+# Result
+bool success
+int32 error_code
+
+# Error Codes
+int32 SUCCESS = 0
+int32 TRAJECTORY_FAILED = -1
+---
+# Feedback
+trajectory_msgs/JointTrajectory goal_joint_trajectory

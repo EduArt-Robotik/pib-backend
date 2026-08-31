@@ -47,6 +47,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 	"action/RunProgram.action"
 	"action/RecordAudio.action"
 	"action/Chat.action"
+  "action/MoveToPose.action"
 	DEPENDENCIES trajectory_msgs
 )
 
