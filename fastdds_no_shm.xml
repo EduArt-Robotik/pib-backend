@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dds xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+
+  <profiles>
+
+    <transport_descriptors>
+
+      <transport_descriptor>
+        <transport_id>udp_transport</transport_id>
+        <type>UDPv4</type>
+      </transport_descriptor>
+
+    </transport_descriptors>
+
+    <participant
+        profile_name="docker_participant"
+        is_default_profile="true">
+
+      <rtps>
+
+        <!-- Disable Fast DDS builtin transports, including SHM -->
+        <useBuiltinTransports>false</useBuiltinTransports>
+
+        <!-- Use our explicit UDPv4 transport -->
+        <userTransports>
+          <transport_id>udp_transport</transport_id>
+        </userTransports>
+
+      </rtps>
+
+    </participant>
+
+  </profiles>
+
+</dds>
