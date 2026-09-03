@@ -137,12 +137,13 @@ class MotorControl(Node):
 
         self.startup_pose_executor = StartupPoseExecutor(self, motors=motors)
 
-        if solid_state_relay_bricklet is None:
-            self.get_logger().info(
-                "No SSR configured. Executing startup pose immediately."
-            )
-            self._startup_done = True
-            self._execute_startup_pose()
+        # No Startup pose for the Chatbot Robot. Button 1 is configured to set a neutral pose.
+        # if solid_state_relay_bricklet is None:
+        #     self.get_logger().info(
+        #         "No SSR configured. Executing startup pose immediately."
+        #     )
+        #     self._startup_done = True
+        #     self._execute_startup_pose()
 
     def _execute_startup_pose(self):
         try:
@@ -263,10 +264,12 @@ class MotorControl(Node):
         return overall_success
 
     def on_ssr_state_change(self, msg: SolidStateRelayState):
-        if not msg.turned_on or self._startup_done:
-            return
-        self._startup_done = True
-        self._execute_startup_pose()
+        # No Startup pose for the Chatbot Robot. Button 1 is configured to set a neutral pose.
+        #if not msg.turned_on or self._startup_done:
+        #    return
+        #self._startup_done = True
+        #self._execute_startup_pose()
+        pass
 
     def apply_motor_settings(
         self, request: ApplyMotorSettings.Request, response: ApplyMotorSettings.Response
