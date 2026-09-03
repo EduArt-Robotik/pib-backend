@@ -253,7 +253,7 @@ services:
       dockerfile: ./ros_packages/ros_audio_io/Dockerfile
     command: ros2 launch ros_audio_io launch.py
     profiles:
-      - all
+      # - all # Use local EduArt chatbot backend
       - ros_audio_io
       - voice_assistant
     network_mode: "host"
